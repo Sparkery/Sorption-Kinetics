@@ -12,7 +12,7 @@ def compareCenter(d1, d2):
         dd = [-1, -1]
 	dd[0] = d1[0] - d2[0]
 	dd[1] = d1[1] - d2[1]
-	return (dd[0]**2 + dd[1]**2)**0.5
+	return (float(dd[0])**2 + float(dd[1])**2)**0.5
 
 #Find the center of the spreaded chemical
 #f is a ppm file, SPECIFIC TO ONE PIXEL PER LINE
@@ -24,23 +24,40 @@ def calculateCenter(f):
 	px = 600 #pixels across
 	py = 400 #pixels vertical
 
-        f.readline()
-        f.readline()
-        f.readline()
+##        f.readline()
+##        f.readline()
+##        f.readline()
+##
+##	for X in range(0, px): #pixels across
+##		for Y in range(0, py): #pixels vertical
+##			s = f.readline().split(" ")
+##			if(s[0] == "0" and s[1] == "0" and s[2] == "0"):
+##				sx += X
+##				sy += Y
 
-	for X in range(0, px): #pixels across
-		for Y in range(0, py): #pixels vertical
-			s = f.readline().split(" ")
-			if(s[0] == "0" and s[1] == "0" and s[2] == "0"):
-				sx += X
-				sy += Y
 
-	p = [-1, -1] #position vector for average
+        image = f.read().split()
+        px = int(image[1])
+        py = int(image[2])
+        rbg = list(map(int, image[4:]))
 
-	p[0] = sx / px
-	p[1] = sy / py
+        sx = 0
+        sy = 0
 
-	return p
+        found = 0
+
+        for Y in range(0, px*py):
+            if(rbg[Y*py + 0] == 0 and rbg[Y*py + 1] == 0 and rbg[Y*py + 2] == 0):
+                found += 1
+                sx += Y / py + 0.5
+                sy += Y % py + 0.5
+
+                p = [-1, -1] #position vector for average
+
+                p[0] = float(sx) / found
+                p[1] = float(sy) / found
+
+                return p
 
 #Run the fox
 def main():
