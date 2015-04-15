@@ -18,11 +18,6 @@ def compareCenter(d1, d2):
 #f is a ppm file, SPECIFIC TO ONE PIXEL PER LINE
 #output is a position vector for the center
 def calculateCenter(f):
-	sx = 0 #sum of x-axis
-	sy = 0 #sum of y-axis
-
-	px = 600 #pixels across
-	py = 400 #pixels vertical
 
 ##        f.readline()
 ##        f.readline()
@@ -52,12 +47,12 @@ def calculateCenter(f):
                 sx += Y / py + 0.5
                 sy += Y % py + 0.5
 
-                p = [-1, -1] #position vector for average
+        p = [-1, -1] #position vector for average
 
-                p[0] = float(sx) / found
-                p[1] = float(sy) / found
+        p[0] = float(sx) / found
+        p[1] = float(sy) / found
 
-                return p
+        return p
 
 #Run the fox
 def main():
