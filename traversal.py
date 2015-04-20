@@ -8,64 +8,60 @@
 #d1 and d2 are position vectors
 #output is the magnitude of the change in distance vector
 def compareCenter(d1, d2):
-	print d1, d2
-        dd = [-1, -1]
-	dd[0] = d1[0] - d2[0]
-	dd[1] = d1[1] - d2[1]
-	return (float(dd[0])**2 + float(dd[1])**2)**0.5
+    dd = [-1, -1] #Initialize difference vector
+    dd[0] = d1[0] - d2[0] #Fill difference vector x
+    dd[1] = d1[1] - d2[1] #Fill difference vector y
+    return (float(dd[0])**2 + float(dd[1])**2)**0.5 #Return the magnitude
 
-#Find the center of the spreaded chemical
-#f is a ppm file, SPECIFIC TO ONE PIXEL PER LINE
+#Find the geometric center of the spreaded chemical
+#f is a ppm file, SPECIFIC TO ONE PIXEL PER LINE (deprecated, now takes all)
+#uses human-constructed black/white replecated files
 #output is a position vector for the center
 def calculateCenter(f):
+    sx = 0 #sum of x-axis, initialized
+    sy = 0 #sum of y-axis, initialized
 
-##        f.readline()
-##        f.readline()
-##        f.readline()
-##
-##	for X in range(0, px): #pixels across
-##		for Y in range(0, py): #pixels vertical
-##			s = f.readline().split(" ")
-##			if(s[0] == "0" and s[1] == "0" and s[2] == "0"):
-##				sx += X
-##				sy += Y
+    px = 600 #pixels across
+    py = 400 #pixels vertical
 
+    image = f.read().split() #Read the entire picture file into a list
+    px = int(image[1]) #Gather data containing rows
+    py = int(image[2]) #Gather data containing columns
+    rgb = list(map(int, image[4:])) # Gather individual pixel data, congregated
 
-        image = f.read().split()
-        px = int(image[1])
-        py = int(image[2])
-        rbg = list(map(int, image[4:]))
+    found = 0 #number of black squares found
 
-        sx = 0
-        sy = 0
+    for Y in range(0, px*py): #look through all possible pixels
+        if(rgb[Y*py + 0] == 0 and rgb[Y*py + 1] == 0 and rgb[Y*py + 2] == 0):
+            found += 1 #if all three RGB values lead to blackness, found one
+            sx += Y / py + 0.5 #formula to calculate contribution to rows
+            sy += Y % py + 0.5 #formula to calculate contribution to columns1
 
-        found = 0
+    p = [-1, -1] #position vector for average
 
-        for Y in range(0, px*py):
-            if(rbg[Y*py + 0] == 0 and rbg[Y*py + 1] == 0 and rbg[Y*py + 2] == 0):
-                found += 1
-                sx += Y / py + 0.5
-                sy += Y % py + 0.5
+    p[0] = float(sx) / found #take the arithmetic average to find mean position
+    p[1] = float(sy) / found #take the arithmetic average to find mean position
 
-        p = [-1, -1] #position vector for average
-
-        p[0] = float(sx) / found
-        p[1] = float(sy) / found
-
-        return p
+    return p #return a position vector with average black position
 
 #Run the fox
 def main():
-	f1 = open("frame1.ppm", "r")
-	f2 = open("frame2.ppm", "r")
+    f1 = open("frame1.ppm", "r")
+    f2 = open("frame2.ppm", "r")
 
-	d1 = calculateCenter(f1)
-	d2 = calculateCenter(f2)
-        print d1, d2
-	dd = compareCenter(d1, d2)
+    t = float(raw_input("Time traversed (s): "))
 
-	print "Position 1", d1
-	print "Position 2", d2
-	print "Delta Position", dd
+    d1 = calculateCenter(f1)
+    d2 = calculateCenter(f2)
+    print "Position Vectors 1 and 2: " d1, d2
+    dd = compareCenter(d1, d2)
 
+    ave = dd/t
+    
+    print "Position frame 1", d1
+    print "Position frame 2", d2
+    print "Delta Position", dd
+    print
+    print "Average speed (pix/s) ", ave
+    
 main()
